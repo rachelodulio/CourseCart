@@ -252,15 +252,31 @@ export function usePurchaseOrders({ authUser, module }) {
     }
   };
 
+
   const togglePOForm = () => {
-    setPoError("");
+    if (showPOForm) {
+      cancelPOForm();
+      return;
+    }
+
+    resetPOForm();
     setPoSuccess("");
-    setShowPOForm((old) => !old);
+    setShowPOForm(true);
+  };
+
+
+
+  const resetPOForm = () => {
+    setPoSupplier("");
+    setPoItems([
+      { product: "", quantityOrdered: "", unitCost: "" },
+    ]);
+    setPoError("");
   };
 
   const cancelPOForm = () => {
+    resetPOForm();
     setShowPOForm(false);
-    setPoError("");
   };
 
   const clearPoFilters = () => {

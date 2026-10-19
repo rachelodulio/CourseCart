@@ -1,6 +1,4 @@
-
 import { useEffect, useMemo, useState } from "react";
-
 
 function POS({
   posSearch,
@@ -44,13 +42,12 @@ function POS({
     dismissReceipt();
   };
 
-
   // Get the available categories from the products currently supplied to POS.
   const categories = useMemo(() => {
     const uniqueCategories = new Set(
       (posFilteredProducts || []).map((product) =>
-        String(product.category || "General").trim()
-      )
+        String(product.category || "General").trim(),
+      ),
     );
 
     return [...uniqueCategories].sort((a, b) => a.localeCompare(b));
@@ -66,20 +63,20 @@ function POS({
 
     return products.filter(
       (product) =>
-        String(product.category || "General").trim() === selectedCategory
+        String(product.category || "General").trim() === selectedCategory,
     );
   }, [posFilteredProducts, selectedCategory]);
 
   const totalPages = Math.max(
     1,
-    Math.ceil(filteredProducts.length / productsPerPage)
+    Math.ceil(filteredProducts.length / productsPerPage),
   );
 
   const safeCurrentPage = Math.min(currentPage, totalPages);
 
   const paginatedProducts = filteredProducts.slice(
     (safeCurrentPage - 1) * productsPerPage,
-    safeCurrentPage * productsPerPage
+    safeCurrentPage * productsPerPage,
   );
 
   // Return to page 1 whenever the search, category, or page size changes.
@@ -94,7 +91,6 @@ function POS({
     }
   }, [currentPage, totalPages]);
 
-  
   const discountAmount = useMemo(() => {
     const subtotal = Math.max(0, Number(cartSubtotal) || 0);
 
@@ -103,8 +99,8 @@ function POS({
         return Math.min(subtotal * 0.05, 50);
 
       case "birthday":
-        return Math.min(subtotal * 0.10, 100);
-      
+        return Math.min(subtotal * 0.1, 100);
+
       case "senior":
         return subtotal * 0.05;
 
@@ -119,7 +115,6 @@ function POS({
   useEffect(() => {
     setPosDiscount(discountAmount.toFixed(2));
   }, [discountAmount, setPosDiscount]);
-
 
   return (
     <section className="pos-layout">
@@ -167,9 +162,7 @@ function POS({
               Show{" "}
               <select
                 value={productsPerPage}
-                onChange={(e) =>
-                  setProductsPerPage(Number(e.target.value))
-                }
+                onChange={(e) => setProductsPerPage(Number(e.target.value))}
                 aria-label="Products per page"
               >
                 <option value={6}>6</option>
@@ -203,9 +196,7 @@ function POS({
 
                   <strong>{product.name}</strong>
 
-                  <span>
-                    ₱{Number(product.price || 0).toFixed(2)}
-                  </span>
+                  <span>₱{Number(product.price || 0).toFixed(2)}</span>
 
                   <small>{product.stock} in stock</small>
 
@@ -218,21 +209,18 @@ function POS({
               ))}
 
               {filteredProducts.length === 0 && (
-                <p className="feedback">
-                  No available products found.
-                </p>
+                <p className="feedback">No available products found.</p>
               )}
             </div>
 
             {filteredProducts.length > 0 && (
               <div className="pos-pagination">
                 <span>
-                  Showing{" "}
-                  {(safeCurrentPage - 1) * productsPerPage + 1}
+                  Showing {(safeCurrentPage - 1) * productsPerPage + 1}
                   {"–"}
                   {Math.min(
                     safeCurrentPage * productsPerPage,
-                    filteredProducts.length
+                    filteredProducts.length,
                   )}
                   {" of "}
                   {filteredProducts.length} products
@@ -267,9 +255,7 @@ function POS({
                     type="button"
                     className="secondary-button"
                     onClick={() =>
-                      setCurrentPage((page) =>
-                        Math.min(totalPages, page + 1)
-                      )
+                      setCurrentPage((page) => Math.min(totalPages, page + 1))
                     }
                     disabled={safeCurrentPage === totalPages}
                   >
@@ -327,14 +313,15 @@ function POS({
                   max={item.stock}
                   step="1"
                   value={item.quantity}
-                  onChange={(e) =>
-                    changeCartQuantity(item._id, e.target.value)
-                  }
-                />
+                  onChange={(e) => {
+                    const value = e.target.value;
 
-                <strong>
-                  ₱{(item.price * item.quantity).toFixed(2)}
-                </strong>
+                    // Allow only whole-number quantities.
+                    if (value === "" || /^\d+$/.test(value)) {
+                      changeCartQuantity(item._id, value);
+                    }
+                  }}
+                />
 
                 <button
                   type="button"
@@ -354,30 +341,26 @@ function POS({
             <strong>₱{cartSubtotal.toFixed(2)}</strong>
           </div>
 
-          
-          
-        <label>
-          Discount Type
-          <select
-            value={selectedDiscountType}
-            onChange={(e) => setSelectedDiscountType(e.target.value)}
-          >
-            <option value="none">No Discount</option>
-            <option value="student">Student Discount (5%, max ₱50)</option>
-            <option value="birthday">Birthday Discount (10%, max ₱100)</option>
-            <option value="senior">Senior Citizen Discount (5%)</option>
-            <option value="PWD">PWD Discount (5%)</option>
+          <label>
+            Discount Type
+            <select
+              value={selectedDiscountType}
+              onChange={(e) => setSelectedDiscountType(e.target.value)}
+            >
+              <option value="none">No Discount</option>
+              <option value="student">Student Discount (5%, max ₱50)</option>
+              <option value="birthday">
+                Birthday Discount (10%, max ₱100)
+              </option>
+              <option value="senior">Senior Citizen Discount (5%)</option>
+              <option value="PWD">PWD Discount (5%)</option>
+            </select>
+          </label>
 
-          </select>
-        </label>
-
-        <div className="pos-total-row">
-          <span>Discount Amount</span>
-          <strong>
-            -₱{Number(posDiscount || 0).toFixed(2)}
-          </strong>
-        </div>
-
+          <div className="pos-total-row">
+            <span>Discount Amount</span>
+            <strong>-₱{Number(posDiscount || 0).toFixed(2)}</strong>
+          </div>
 
           <label>
             Payment Method
@@ -387,7 +370,6 @@ function POS({
             >
               <option value="cash">Cash</option>
               <option value="gcash">GCash</option>
-              
             </select>
           </label>
 
@@ -409,7 +391,6 @@ function POS({
             <strong>₱{Number(cartTotal || 0).toFixed(2)}</strong>
           </div>
 
-
           <div className="pos-total-row">
             <span>Change</span>
             <strong>₱{cartChange.toFixed(2)}</strong>
@@ -425,15 +406,13 @@ function POS({
             {checkoutSaving ? "Processing Sale..." : "Complete Sale"}
           </button>
         </form>
-      
 
         {completedSale && (
           <div className="pos-receipt">
             <h3>Sale Completed!</h3>
 
             <p>
-              <strong>Transaction:</strong>{" "}
-              {completedSale.transactionNumber}
+              <strong>Transaction:</strong> {completedSale.transactionNumber}
             </p>
 
             <p>

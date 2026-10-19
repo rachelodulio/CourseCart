@@ -163,7 +163,7 @@ function App() {
           {module === "activity-logs" && authUser.role === "admin" && (
             <ActivityLogs
               {...activityLogs}
-              onRefresh={() => setModule("activity-logs")}
+              onRefresh={activityLogs.refreshActivityLogs}
             />
           )}
           {module === "dashboard" && (

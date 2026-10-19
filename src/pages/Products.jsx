@@ -27,6 +27,19 @@ function Products({
   handleArchiveProduct,
   handleRestoreProduct,
 }) {
+  // Normalize role values so "Inventory Staff", "inventory_staff", and
+  // "inventory-staff" are handled consistently.
+  const normalizedRole = String(authUser?.role || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ");
+
+  const canManageProducts =
+    normalizedRole === "admin" ||
+    normalizedRole === "inventory staff" ||
+    normalizedRole === "inventory";
+
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [stockFilter, setStockFilter] = useState("all");
   const [productsPerPage, setProductsPerPage] = useState(10);
@@ -124,23 +137,21 @@ function Products({
           <h3>Products</h3>
           <p>Manage school supplies and stock.</p>
         </div>
-
-        
-          {productView === "active" && (
-            <button
-              type="button"
-              className="primary-button"
-              onClick={openAddProduct}
-              disabled={showProductForm}
-              title={
-                showProductForm
-                  ? "Finish or cancel the current product form first."
-                  : "Add a new product"
-              }
-            >
-              {showProductForm ? "Product Form Open" : "+ Add Product"}
-            </button>
-          )}
+        {canManageProducts && productView === "active" && (
+          <button
+            type="button"
+            className="primary-button"
+            onClick={openAddProduct}
+            disabled={showProductForm}
+            title={
+              showProductForm
+                ? "Finish or cancel the current product form first."
+                : "Add a new product"
+            }
+          >
+            {showProductForm ? "Product Form Open" : "+ Add Product"}
+          </button>
+        )}
 
       </div>
 
@@ -148,7 +159,7 @@ function Products({
         <p className="success-message">{productSuccess}</p>
       )}
 
-      {showProductForm && productView === "active" && (
+      {canManageProducts && showProductForm && productView === "active" && (
         <ProductForm
           productForm={productForm}
           setProductForm={setProductForm}
@@ -307,9 +318,8 @@ function Products({
                       </div>
                     </div>
 
-                    
                     <div className="product-actions">
-                      {authUser?.role === "admin" && (
+                      {canManageProducts && (
                         productView === "active" ? (
                           <>
                             <button

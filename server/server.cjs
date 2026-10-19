@@ -41,6 +41,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/activity-logs", activityLogRoutes);
 
+
 const startServer = async () => {
   try {
     await connectDB();

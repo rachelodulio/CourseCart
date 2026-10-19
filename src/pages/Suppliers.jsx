@@ -66,6 +66,8 @@ function Suppliers({
           <p>Manage supplier contacts and information.</p>
         </div>
 
+       
+
 
           {supplierView === "active" && (
             <button
